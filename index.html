@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+       * { 
+           margin: 0; padding: 0;
+        }  
+       
+     html, body {
+          height: 100%; width: 100%; 
+          }
+          #preview{
+              display: block;
+          }
+          #main>canvas{
+              display: inline-block;
+              width: 100px;
+              height: 100px;  
+          }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div id="imgblock">
+            <canvas id="preview"  width="300px" height="300px">
+        </div>
+        <div>
+            <input type="file" name="file" id="doc" onchange="javascript:setImagePreview()">
+            <input type="button" value="生成拼图"  onclick="javascript:cutImg()">
+        </div>
+        <div id="main">
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        function setImagePreview(avalue){
+            var docObj=document.getElementById("doc");
+            var imgObjPreview=document.getElementById("preview");
+            var ctx=imgObjPreview.getContext("2d")
+            var _img=new Image()
+            var imgUrl=window.URL.createObjectURL(docObj.files[0])
+            _img.src=imgUrl;
+            _img.onload=function(){
+                ctx.drawImage(_img,0,0);
+            }
+        }
+        function cutImg(){
+            var _option={
+                row:4,
+                col:4
+            }
+            for(var i=0;i<_option.row-1;i++){
+                for(var j=0;j<_option.col-1;j++){
+                    copy(i,j);
+                }
+            }
+        }
+        function copy(i,j){
+            var _target=document.getElementById("main")
+            var _canvas=document.createElement("canvas")
+            _canvas.id="imageblock"+i+j+"";
+            _target.appendChild(_canvas)
+            var _imgObjPreview=document.getElementById("preview");//获取原图像图像
+            var _ctx=_imgObjPreview.getContext("2d")//获取原图像画布
+            var _id="imageblock"+i+j+"";
+            var ib=document.getElementById(_id);
+            var ctx=ib.getContext("2d");//获取切图画布
+            var imgData=_ctx.getImageData(i*100,j*100,100,100);
+            ctx.putImageData(imgData,0,0);
+        }
+            
+    </script>
+</body>
+</html>
