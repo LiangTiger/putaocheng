@@ -17,9 +17,12 @@
               display: block;
           }
           #main>canvas{
-              display: inline-block;
-              width: 100px;
-              height: 100px;  
+              display: block;
+              float:left;
+              border: 1px solid white;
+          }
+          .clearLeft{
+              clear: left;
           }
     </style>
 </head>
@@ -50,26 +53,32 @@
         }
         function cutImg(){
             var _option={
-                row:4,
-                col:4
+                row:3,
+                col:3
             }
             for(var i=0;i<_option.row-1;i++){
                 for(var j=0;j<_option.col-1;j++){
-                    copy(i,j);
+                    copy(j,i);//使渲染顺序从左到右
                 }
             }
         }
-        function copy(i,j){
+        function copy(j,i){
             var _target=document.getElementById("main")
             var _canvas=document.createElement("canvas")
-            _canvas.id="imageblock"+i+j+"";
-            _target.appendChild(_canvas)
+            _canvas.id="imageblock"+j+i+"";
+            _target.appendChild(_canvas);
             var _imgObjPreview=document.getElementById("preview");//获取原图像图像
             var _ctx=_imgObjPreview.getContext("2d")//获取原图像画布
-            var _id="imageblock"+i+j+"";
+            var _id="imageblock"+j+i+"";
             var ib=document.getElementById(_id);
+            ib.width=100;
+            ib.height=100;
+            console.log(j+'___'+i)
+            if(j===0){
+                ib.setAttribute("class","clearLeft")
+            }
             var ctx=ib.getContext("2d");//获取切图画布
-            var imgData=_ctx.getImageData(i*100,j*100,100,100);
+            var imgData=_ctx.getImageData(j*100,i*100,100,100);
             ctx.putImageData(imgData,0,0);
         }
             
