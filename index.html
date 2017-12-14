@@ -22,14 +22,15 @@
             display: block;
         }
 
-        #main>canvas {
-            display: block;
-            float: left;
-            border: 1px solid white;
+        #main {
+            width: 400px;
+            height: 400px;
         }
 
-        .clearLeft {
-            clear: left;
+        #main>canvas {
+            display: inline-block;
+            border: 1px solid white;
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -48,6 +49,17 @@
         </div>
     </div>
     <script type="text/javascript">
+        function option() {
+            var init = {
+                row: 3,
+                col: 3
+            }
+            return {
+                _row: init.row,
+                _col: init.col
+            }
+        }
+
         function setImagePreview(avalue) {
             var docObj = document.getElementById("doc");
             var imgObjPreview = document.getElementById("preview");
@@ -61,66 +73,88 @@
         }
 
         function cutImg() {
-            var _option = {
-                row: 3,
-                col: 3
-            }
-            for (var i = 0; i < _option.row; i++) {
-                for (var j = 0; j < _option.col; j++) {
+            var i, j
+            for (i = 0; i < option()._row; i++) {
+                for (j = 0; j < option()._col; j++) {
                     copy(j, i); //使渲染顺序从左到右
                 }
+            }
+        }
+
+        function getTargetId(j, i) {
+            var _id = "imageblock" + j + i + "";
+            var ib = document.getElementById(_id);
+            return {
+                id: _id,
+                ib: ib
+            }
+        }
+        //计算元素距离body的left和top
+        function getTargetOffset(j, i) {
+            var totalLeft = null;
+            var totalTop = null;
+            var _id = getTargetId(j, i).ib;
+            var _par = _id.offsetParent;
+            totalLeft += _id.offsetLeft;
+            totalTop += _id.offsetTop;
+            while (_par) {
+                totalLeft += _par.clientLeft;
+                totalTop += _par.clientTop;
+                _par = _par.offsetParent;
+            }
+            return {
+                left: totalLeft,
+                top: totalTop
             }
         }
 
         function copy(j, i) {
             var _target = document.getElementById("main")
             var _canvas = document.createElement("canvas")
-            _canvas.id = "imageblock" + j + i + "";
+            _canvas.id = getTargetId(j, i).id;
             _target.appendChild(_canvas);
             var _imgObjPreview = document.getElementById("preview"); //获取原图像图像
             var _ctx = _imgObjPreview.getContext("2d") //获取原图像画布
-            var _id = "imageblock" + j + i + "";
-            var ib = document.getElementById(_id);
+            var ib = getTargetId(j, i).ib;
             ib.width = 100;
             ib.height = 100;
-            if (j === 0) {
-                ib.setAttribute("class", "clearLeft")
-            }
             var ctx = ib.getContext("2d"); //获取切图画布
             var imgData = _ctx.getImageData(j * 100, i * 100, 100, 100);
             ctx.putImageData(imgData, 0, 0);
+        }
+
+        function impactCheck(e) {
+            var i, j
+            for (i = 0; i < option()._row; i++) {
+                for (j = 0; j < option()._col; j++) {
+
+                    if (0 < e.clientX - getTargetOffset(j, i).left < 100 && 0 <= e.clientY - getTargetOffset(j, i).top <100) {
+                        console.log(getTargetId(j, i).id + "是被碰撞的")
+                        console.log(e.clientX - getTargetOffset(j, i).left)
+                    }
+                    // console.log("检测碰撞成功")
+                }
+            }
         }
         (function listenClick() {
             var _target = document.getElementById("main")
             _target.addEventListener("mousedown", function (ev) {
                 var ev = ev || event;
+                var elLeft = ev.clientX - ev.target.offsetLeft;
+                var elTop = ev.clientY - ev.target.offsetTop;
                 if (ev.target.nodeName == "CANVAS") {
                     document.onmousemove = function (_ev) {
+                        impactCheck(_ev);
                         ev.target.style.position = "absolute";
-                        ev.target.style.left = _ev.clientX + "px";
-                        ev.target.style.right = _ev.clientY + "px";
+                        ev.target.style.left = _ev.clientX - elLeft + "px";
+                        ev.target.style.top = _ev.clientY - elTop + "px";
                     }
                 }
             })
             _target.addEventListener("mouseup", function (ev) {
-                document.onmousemove=null
-                var ev = ev || event;
-                if (ev.target.nodeName == "CANVAS") {
-                    console.log("123123")
-                        ev.target.style.position = "absolute";
-                        ev.target.style.left = getMousePos().x+ "px";
-                        ev.target.style.right = getMousePos().y+ "px";
-                }
+                document.onmousemove = null
             })
         })()
-
-        function getMousePos(event) {
-            var e = event || window.event;
-            return {
-                'x': e.screenX,
-                'y': e.screenY
-            }
-        }
     </script>
 </body>
 
