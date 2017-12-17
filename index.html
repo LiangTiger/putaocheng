@@ -30,7 +30,8 @@
         #main>canvas {
             display: inline-block;
             border: 1px solid white;
-            margin-bottom: 0;
+            position: absolute;
+            z-index: 0;
         }
     </style>
 </head>
@@ -118,6 +119,8 @@
             var ib = getTargetId(j, i).ib;
             ib.width = 100;
             ib.height = 100;
+            ib.style.left=j*100+"px";
+            ib.style.top=i*100+"px";
             var ctx = ib.getContext("2d"); //获取切图画布
             var imgData = _ctx.getImageData(j * 100, i * 100, 100, 100);
             ctx.putImageData(imgData, 0, 0);
@@ -131,56 +134,50 @@
                             j, i).left > -50 &&
                         e.target.offsetTop - getTargetOffset(j, i).top < 50 && e.target.offsetTop - getTargetOffset(j,
                             i).top > -50) {
+                                console.log(getTargetId(j, i).id)
                         return getTargetId(j, i).id;
                     }
                     // console.log("检测碰撞成功")
                 }
             }
         }
-        //根据元素id替换图片数据
+        //根据元素id替换图片
         function replaceCanvas(target, select) {
             var targetId = document.getElementById(target);
             var selectId = document.getElementById(select);
-            var t_ctx = targetId.getContext("2d");
-            var s_ctx = selectId.getContext("2d");
-            var t_imgData = t_ctx.getImageData(0, 0, 100, 100);
-            var s_imgData = s_ctx.getImageData(0, 0, 100, 100);
-            t_ctx.putImageData(s_imgData, 0, 0);
-            s_ctx.putImageData(t_imgData, 0, 0);
-        }
-        //获取元素的位置信息
-        function getPosition(ev){
-            var _left=ev.ev.target.offsetLeft
-            var _top=ev.target.offsetTop
-            return {
-                left:_left,
-                top:_top
-            }
+  
+            selectId.style.left=targetId.offsetLeft+"px";
+
+            selectId.style.top=targetId.offsetTop+"px";
         }
         (function listenClick() {
-            var positionLeft,positionTop
+            var positionLeft, positionTop
             var _target = document.getElementById("main")
             _target.addEventListener("mousedown", function (ev) {
-                positionLeft=ev.target.offsetLeft;
-                positionTop=ev.target.offsetTop
+                positionLeft = ev.target.offsetLeft;
+                positionTop = ev.target.offsetTop
                 var ev = ev || event;
                 var elLeft = ev.clientX - ev.target.offsetLeft;
                 var elTop = ev.clientY - ev.target.offsetTop;
                 if (ev.target.nodeName == "CANVAS") {
                     document.onmousemove = function (_ev) {
-                        ev.target.style.position = "absolute";
+                        impactCheck(_ev)
                         ev.target.style.left = _ev.clientX - elLeft + "px";
                         ev.target.style.top = _ev.clientY - elTop + "px";
+                        ev.target.style.zIndex=1
                     }
                 }
             })
             _target.addEventListener("mouseup", function (ev) {
                 document.onmousemove = null
+                ev.target.removeAttribute("zIndex")
                 var impactId = impactCheck(ev);
                 var selectId = ev.target.id;
                 replaceCanvas(impactId, selectId)
-                ev.target.style.left=positionLeft+"px";
-                ev.target.style.top=positionTop+"px";
+                var impactCanvan=document.getElementById(impactId);
+                impactCanvan.style.left = positionLeft + "px";
+                impactCanvan.style.top = positionTop + "px";
+                console.log(selectId)
             })
         })()
     </script>
