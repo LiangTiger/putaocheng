@@ -50,6 +50,7 @@
         </div>
     </div>
     <script type="text/javascript">
+        var  resultArray=[]
         function option() {
             var init = {
                 row: 3,
@@ -57,7 +58,7 @@
             }
             return {
                 _row: init.row,
-                _col: init.col
+                _col: init.col,
             }
         }
 
@@ -72,12 +73,12 @@
                 ctx.drawImage(_img, 0, 0);
             }
         }
-
-        function cutImg() {
+        function cutImg() {      
             var i, j
             for (i = 0; i < option()._row; i++) {
                 for (j = 0; j < option()._col; j++) {
                     copy(j, i); //使渲染顺序从左到右
+                    resultArray.push("imageblock"+j+i)
                 }
             }
         }
@@ -134,7 +135,7 @@
                             j, i).left > -50 &&
                         e.target.offsetTop - getTargetOffset(j, i).top < 50 && e.target.offsetTop - getTargetOffset(j,
                             i).top > -50) {
-                                console.log(getTargetId(j, i).id)
+                                // console.log(getTargetId(j, i).id)
                         return getTargetId(j, i).id;
                     }
                     // console.log("检测碰撞成功")
@@ -145,7 +146,7 @@
         function replaceCanvas(target, select) {
             var targetId = document.getElementById(target);
             var selectId = document.getElementById(select);
-  
+            
             selectId.style.left=targetId.offsetLeft+"px";
 
             selectId.style.top=targetId.offsetTop+"px";
@@ -169,17 +170,21 @@
                 }
             })
             _target.addEventListener("mouseup", function (ev) {
-                document.onmousemove = null
-                ev.target.removeAttribute("zIndex")
+                // console.log(resultArray)
+                var newArray=resultArray;
+                var i=newArray.indexOf(ev.target.id);
+                console.log(i)
+                document.onmousemove = null;
+                ev.target.style.zIndex=null;
                 var impactId = impactCheck(ev);
                 var selectId = ev.target.id;
                 replaceCanvas(impactId, selectId)
                 var impactCanvan=document.getElementById(impactId);
                 impactCanvan.style.left = positionLeft + "px";
                 impactCanvan.style.top = positionTop + "px";
-                console.log(selectId)
             })
         })()
+
     </script>
 </body>
 
