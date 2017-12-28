@@ -11,180 +11,18 @@
             margin: 0;
             padding: 0;
         }
-
-        html,
-        body {
-            height: 100%;
-            width: 100%;
-        }
-
-        #preview {
-            display: block;
-        }
-
-        #main {
-            width: 400px;
-            height: 400px;
-        }
-
-        #main>canvas {
-            display: inline-block;
-            border: 1px solid white;
-            position: absolute;
-            z-index: 0;
-        }
     </style>
 </head>
 
 <body>
-    <div id="content">
-        <div id="imgblock">
-            <canvas id="preview" width="300px" height="300px">
-        </div>
-        <div>
-            <input type="file" name="file" id="doc" onchange="javascript:setImagePreview()">
-            <input type="button" value="生成拼图" onclick="javascript:cutImg()">
-        </div>
-        <div id="main">
-
-        </div>
+    <div>
+        <input type="file" name="">
+        <br/>
+        <img src="" alt=""> 
     </div>
+    <script src="puzzle.js"></script>
     <script type="text/javascript">
-        var  resultArray=[]
-        function option() {
-            var init = {
-                row: 3,
-                col: 3
-            }
-            return {
-                _row: init.row,
-                _col: init.col,
-            }
-        }
-
-        function setImagePreview(avalue) {
-            var docObj = document.getElementById("doc");
-            var imgObjPreview = document.getElementById("preview");
-            var ctx = imgObjPreview.getContext("2d")
-            var _img = new Image()
-            var imgUrl = window.URL.createObjectURL(docObj.files[0])
-            _img.src = imgUrl;
-            _img.onload = function () {
-                ctx.drawImage(_img, 0, 0);
-            }
-        }
-        function cutImg() {      
-            var i, j
-            for (i = 0; i < option()._row; i++) {
-                for (j = 0; j < option()._col; j++) {
-                    copy(j, i); //使渲染顺序从左到右
-                    resultArray.push("imageblock"+j+i)
-                }
-            }
-        }
-
-        function getTargetId(j, i) {
-            var _id = "imageblock" + j + i + "";
-            var ib = document.getElementById(_id);
-            return {
-                id: _id,
-                ib: ib
-            }
-        }
-        //计算元素距离body的left和top
-        function getTargetOffset(j, i) {
-            var totalLeft = null;
-            var totalTop = null;
-            var _id = getTargetId(j, i).ib;
-            var _par = _id.offsetParent;
-            totalLeft += _id.offsetLeft;
-            totalTop += _id.offsetTop;
-            while (_par) {
-                totalLeft += _par.clientLeft;
-                totalTop += _par.clientTop;
-                _par = _par.offsetParent;
-            }
-            return {
-                left: totalLeft,
-                top: totalTop
-            }
-        }
-
-        function copy(j, i) {
-            var _target = document.getElementById("main")
-            var _canvas = document.createElement("canvas")
-            _canvas.id = getTargetId(j, i).id;
-            _target.appendChild(_canvas);
-            var _imgObjPreview = document.getElementById("preview"); //获取原图像图像
-            var _ctx = _imgObjPreview.getContext("2d") //获取原图像画布
-            var ib = getTargetId(j, i).ib;
-            ib.width = 100;
-            ib.height = 100;
-            ib.style.left=j*100+"px";
-            ib.style.top=i*100+"px";
-            var ctx = ib.getContext("2d"); //获取切图画布
-            var imgData = _ctx.getImageData(j * 100, i * 100, 100, 100);
-            ctx.putImageData(imgData, 0, 0);
-        }
-
-        function impactCheck(e) {
-            var i, j
-            for (i = 0; i < option()._row; i++) {
-                for (j = 0; j < option()._col; j++) {
-                    if (e.target.offsetLeft - getTargetOffset(j, i).left < 50 && e.target.offsetLeft - getTargetOffset(
-                            j, i).left > -50 &&
-                        e.target.offsetTop - getTargetOffset(j, i).top < 50 && e.target.offsetTop - getTargetOffset(j,
-                            i).top > -50) {
-                                // console.log(getTargetId(j, i).id)
-                        return getTargetId(j, i).id;
-                    }
-                    // console.log("检测碰撞成功")
-                }
-            }
-        }
-        //根据元素id替换图片
-        function replaceCanvas(target, select) {
-            var targetId = document.getElementById(target);
-            var selectId = document.getElementById(select);
-            
-            selectId.style.left=targetId.offsetLeft+"px";
-
-            selectId.style.top=targetId.offsetTop+"px";
-        }
-        (function listenClick() {
-            var positionLeft, positionTop
-            var _target = document.getElementById("main")
-            _target.addEventListener("mousedown", function (ev) {
-                positionLeft = ev.target.offsetLeft;
-                positionTop = ev.target.offsetTop
-                var ev = ev || event;
-                var elLeft = ev.clientX - ev.target.offsetLeft;
-                var elTop = ev.clientY - ev.target.offsetTop;
-                if (ev.target.nodeName == "CANVAS") {
-                    document.onmousemove = function (_ev) {
-                        impactCheck(_ev)
-                        ev.target.style.left = _ev.clientX - elLeft + "px";
-                        ev.target.style.top = _ev.clientY - elTop + "px";
-                        ev.target.style.zIndex=1
-                    }
-                }
-            })
-            _target.addEventListener("mouseup", function (ev) {
-                // console.log(resultArray)
-                var newArray=resultArray;
-                var i=newArray.indexOf(ev.target.id);
-                console.log(i)
-                document.onmousemove = null;
-                ev.target.style.zIndex=null;
-                var impactId = impactCheck(ev);
-                var selectId = ev.target.id;
-                replaceCanvas(impactId, selectId)
-                var impactCanvan=document.getElementById(impactId);
-                impactCanvan.style.left = positionLeft + "px";
-                impactCanvan.style.top = positionTop + "px";
-            })
-        })()
-
+        
     </script>
 </body>
 
