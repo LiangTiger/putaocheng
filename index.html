@@ -6,23 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <style type="text/css">
-        * {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="puzzle.css">
 </head>
 
 <body>
     <div>
-        <input type="file" name="">
-        <br/>
-        <img src="" alt=""> 
+        <input id="file" type="file" name="">
+        <div id="btn">
+            <i class="iconfont icon-xiangji2"></i>
+        </div>
+        <div id="gameArea">
+            <!-- 游戏开始按钮 -->
+            <div id="gameStart">点击开始</div>
+            <!-- 图片存放的区域 -->
+            <div id="imgArea"></div>
+        </div>
     </div>
     <script src="puzzle.js"></script>
     <script type="text/javascript">
-        
+        var puzzle=new Puzzle({
+            leverNow:3,
+            imgAreaSize:400
+        })
     </script>
 </body>
 
