@@ -7,27 +7,30 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="puzzle.css">
+    <link rel="stylesheet" href="font/iconfont.css">
 </head>
 
 <body>
-    <div>
-        <input id="file" type="file" name="">
-        <div id="btn">
-            <i class="iconfont icon-xiangji2"></i>
-        </div>
-        <div id="gameArea">
-            <!-- 游戏开始按钮 -->
-            <div id="gameStart">点击开始</div>
-            <!-- 图片存放的区域 -->
-            <div id="imgArea"></div>
-        </div>
-    </div>
+	<!-- 获取图片 -->
+	<input type="file" id="file">
+	<!-- 字体图标 -->
+	<div id="btn">
+		<i class="iconfont icon-xiangji2"></i>		
+	</div>
+	<div id="gameArea">
+		<!-- 游戏开始按钮 -->
+		<div id="gameStart">点击开始</div>
+		<!-- 图片存放的区域 -->
+		<div id="imgArea"></div>
+	</div>
+	
     <script src="puzzle.js"></script>
     <script type="text/javascript">
         var puzzle=new Puzzle({
             leverNow:3,
             imgAreaSize:400
         })
+        puzzle.gameStart();
     </script>
 </body>
 

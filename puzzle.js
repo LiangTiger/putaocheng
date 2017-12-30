@@ -20,7 +20,7 @@ Puzzle.prototype = {
         // 获取点击开始的按钮的DOM元素
         this.gameStartBtnObj = document.getElementById("gameStart");
         // 获取游戏区域的DOM元素
-        this.gameAreaObj = document.getElementById('ganmeArea');
+        this.gameAreaObj = document.getElementById('gameArea');
         //获取每一小格子的DOM元素
         this.imgCells = '';
         //获取游戏区域的宽度，最小值为400
@@ -45,40 +45,47 @@ Puzzle.prototype = {
         this.getImageUrl()
     },
     getImageUrl: function () {
+        // 拿到当前的this
         var self = this;
+        // 让按钮点击模拟input点击
         this.btnObj.onclick = function () {
-                self.inputObj.click();
-            },
-            this.inputObj.onchange = function () {
-                var files = this.files;
-                var reader = new FileReader();
-                reader.readAsDataURL(files[0]);
-                reader.onload = function () {
-                    self.imgUrl = reader.result;
-                    self.imgSplit();
-                }
-            }
-
+            self.inputObj.click();
+        }
+        // 监听input的改变事件
+        this.inputObj.onchange = function () {
+            // 拿到文件数组
+            // 创建一个 FileReader对象
+            var Url = window.URL.createObjectURL(this.files[0]);
+            // 读取完成时 拿到编码
+            // 获取图片路径
+            self.imgUrl = Url;
+            // 切割图片
+            self.imgSplit();
+        };
     },
     imgSplit: function () {
         this.imgArea.innerHTML = '';
         var _cell = '';
         for (var i = 0, l = this.leverArr[0]; i < l; i++) {
-            for (var j = 0, l = this.leverArr[1]; j < l; j++) {
+            for (var j = 0, len = this.leverArr[1]; j < len; j++) {
                 this.imgOrigArr.push(i * this.leverArr[0] + j);
                 _cell = document.createElement("div");
                 _cell.className = "imgCell";
                 _cell.index = i * this.leverArr[0] + j;
                 _cell.style.width = this.cellWidth + "px";
                 _cell.style.height = this.cellHeight + "px";
-                _cell.style.left = j * this.cellwidth + "px";
-                _cell.style.top = i * this.cellWidth + "px";
-                _cell.style.backgroundPosition = (-j) * this.cellWidth + "px " + (-i) * this.cellHeight + "px";
+                _cell.style.left = j * this.cellWidth + "px";
+                _cell.style.top = i * this.cellHeight + "px";
+                _cell.style.backgroundImage = "url(" + this.imgUrl + ")";
+                _cell.style.backgroundSize = this.leverArr[1] + '00%';
+                _cell.style.backgroundPosition = (-j) * this.cellWidth + 'px ' + (-i) * this.cellHeight + 'px';
                 _cell.style.backgroundOrigin = "border-box";
+                _cell.style.backgroundRepeat = "no-repeat";
                 this.imgArea.appendChild(_cell);
             }
         }
         this.imgCells = document.querySelectorAll('.imgCell');
+        console.log(this.btnObj.offsetWidth)
         this.btnObj.style.left = -this.btnObj.offsetWidth + 'px';
         this.gameAreaObj.style.left = "50%";
         this.gameAreaObj.style.transform = "translateX(-50%)";
@@ -116,53 +123,71 @@ Puzzle.prototype = {
         }
     },
     randomArr: function () {
+        // 清空乱序数组
         this.imgRandomArr = [];
-        var _flag = ture;
+        // 判断原来的数组是否和乱序数组一样
+        var _flag = true;
+        // 遍历原始索引
         for (var i = 0, l = this.imgOrigArr.length; i < l; i++) {
+            // 获取从0到数组长度之间的一个索引值
             var order = Math.floor(Math.random() * this.imgOrigArr.length);
+            // 如果乱序数组中没有值就直接添加
+            // 否则就在这个乱序数组中找对应的随机数的索引，找不到就添加,找到就继续随机
             if (this.imgRandomArr.length > 0) {
                 while (this.imgRandomArr.indexOf(order) > -1) {
-                    order = Math.floor(Math.random() * this.imgOrigArr.length)
+                    order = Math.floor(Math.random() * this.imgOrigArr.length);
                 }
             }
             this.imgRandomArr.push(order);
         }
-        if (this.imgRandomArr.length = this.imgOrigArr.length) {
+
+        // 判断乱序数组和原始数组是否一样
+        if (this.imgRandomArr.length === this.imgOrigArr.length) {
+            // 遍历数组
             for (var i = 0, l = this.imgOrigArr.length; i < l; i++) {
                 if (this.imgRandomArr[i] != this.imgOrigArr[i]) {
                     _flag = false;
                     break;
                 } else {
-                    _flas = ture;
+                    _flag = true;
                 }
             }
         } else {
-            _flag = ture;
+            _flag = true;
         }
+
+        // 返回值为true的话 就代表原始数组和乱序数组一致，重新打乱数组
         if (_flag) {
             this.randomArr();
         }
     },
+    cellOrder: function () {
+        var _self = this;
+        this.imgCells.forEach(function (element, index) {
+            element.style.left = _self.imgRandomArr[index] % _self.leverArr[1] * _self.cellWidth + "px";
+            element.style.top = Math.floor(_self.imgRandomArr[index] / _self.leverArr[1]) * _self.cellHeight + 'px';
+        })
+    },
     cellExchange: function (from, to) {
         var _fromRow = Math.floor(this.imgRandomArr[from] / this.leverArr[1]);
-        var _fromCol = this.imgRandomArr[from] / this.leverArr[1];
+        var _fromCol = this.imgRandomArr[from] % this.leverArr[1];
         var _toRow = Math.floor(this.imgRandomArr[to] / this.leverArr[1]);
-        var _toCol = this.imgRandomArr[to] / this.leverArr[1];
+        var _toCol = this.imgRandomArr[to] % this.leverArr[1];
         this.imgCells[from].style.left = _toCol * this.cellWidth + "px";
         this.imgCells[from].style.top = _toRow * this.cellHeight + "px";
         this.imgCells[to].style.left = _fromCol * this.cellWidth + "px";
         this.imgCells[to].style.top = _fromRow * this.cellHeight + "px";
-        var _temp=this.imgRandomArr[from];
-        this.imgRandomArr[from]=this.imgRandomArr[to];
-        this.imgRandomArr[to]=_temp;
-        if(this.imgOrigArr.toString()===this.imgRandomArr.toString()){
+        var _temp = this.imgRandomArr[from];
+        this.imgRandomArr[from] = this.imgRandomArr[to];
+        this.imgRandomArr[to] = _temp;
+        if (this.imgOrigArr.toString() === this.imgRandomArr.toString()) {
             this.success();
         }
     },
-    success:function(){
-        this.hasStart=0;
-        setTimeout(function(){
+    success: function () {
+        this.hasStart = 0;
+        setTimeout(function () {
             alert("已完成")
-        },500);
+        }, 500);
     }
 }
