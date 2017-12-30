@@ -37,7 +37,7 @@ Puzzle.prototype = {
         this.hasStart = 0;
         //定义第一次点击图片的索引
         this.sel = null;
-        //获取图片的base64编码的地址
+        //获取图片的地址
         this.imgUrl = "";
     },
     //游戏开始
@@ -53,10 +53,7 @@ Puzzle.prototype = {
         }
         // 监听input的改变事件
         this.inputObj.onchange = function () {
-            // 拿到文件数组
-            // 创建一个 FileReader对象
             var Url = window.URL.createObjectURL(this.files[0]);
-            // 读取完成时 拿到编码
             // 获取图片路径
             self.imgUrl = Url;
             // 切割图片
@@ -77,7 +74,7 @@ Puzzle.prototype = {
                 _cell.style.left = j * this.cellWidth + "px";
                 _cell.style.top = i * this.cellHeight + "px";
                 _cell.style.backgroundImage = "url(" + this.imgUrl + ")";
-                _cell.style.backgroundSize = this.leverArr[1] + '00%';
+                _cell.style.backgroundSize = this.leverArr[1] + '00% ' + this.leverArr[1] + '00%';
                 _cell.style.backgroundPosition = (-j) * this.cellWidth + 'px ' + (-i) * this.cellHeight + 'px';
                 _cell.style.backgroundOrigin = "border-box";
                 _cell.style.backgroundRepeat = "no-repeat";
@@ -99,26 +96,26 @@ Puzzle.prototype = {
                 _self.hasStart = 1;
                 _self.randomArr();
                 _self.cellOrder();
-                for (var i = 0, l = _self.imgCells.length; i < l; i++) {
-                    _self.imgCells[i].onclick = function () {
+                _self.imgArea.onclick = function (ev) {
+                    var target = ev.target
+                    if (target.nodeName.toLowerCase() == "div") {
                         if (_self.sel === null) {
-                            _self.sel = this.index;
-                            this.style.border = "2px solid red";
+                            _self.sel = target.index;
+                            target.style.border = "2px solid red";
                         } else {
                             _self.imgCells.forEach(function (element) {
                                 element.style.border = "1px solid #fff";
                             })
-                            if (this.index === _self.sel) {
+                            if (target.index === _self.sel) {
                                 _self.sel = null;
                                 return
                             } else {
-                                _self.cellExchange(_self.sel, this.index);
+                                _self.cellExchange(_self.sel, target.index);
                             }
                             _self.sel = null;
                         }
                     }
                 }
-
             }
         }
     },
